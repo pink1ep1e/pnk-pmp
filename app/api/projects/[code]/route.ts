@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { getSessionUser, sessionHas } from "@/lib/auth"
 import { getStore } from "@/lib/store"
-import { idConnector, mailConnector } from "@/lib/connectors/mock"
+import { idConnector, mailConnector } from "@/lib/connectors"
 
 export async function GET(
   _req: Request,
@@ -18,24 +18,25 @@ export async function GET(
   if (!project) return NextResponse.json({ error: "not found" }, { status: 404 })
 
   if (code === "pnk-id") {
-    return NextResponse.json({
-      project,
-      users: sessionHas(user, ["id.users.read", "id.users.manage"])
-        ? idConnector.listUsers()
-        : [],
-      stats: idConnector.stats(),
-    })
+    const canUsers = sessionHas(user, ["id.users.read", "id.users.manage"])
+    const [users, stats] = await Promise.all([
+      canUsers ? idConnector.listUsers() : Promise.resolve([]),
+      idConnector.stats(),
+    ])
+    return NextResponse.json({ project, users, stats })
   }
 
   if (code === "pnk-mail") {
-    return NextResponse.json({
-      project,
-      mailboxes: sessionHas(user, "mail.mailboxes.read")
+    const [mailboxes, domains, stats] = await Promise.all([
+      sessionHas(user, "mail.mailboxes.read")
         ? mailConnector.listMailboxes()
-        : [],
-      domains: sessionHas(user, "mail.domains") ? mailConnector.listDomains() : [],
-      stats: mailConnector.stats(),
-    })
+        : Promise.resolve([]),
+      sessionHas(user, "mail.domains")
+        ? mailConnector.listDomains()
+        : Promise.resolve([]),
+      mailConnector.stats(),
+    ])
+    return NextResponse.json({ project, mailboxes, domains, stats })
   }
 
   return NextResponse.json({ project })

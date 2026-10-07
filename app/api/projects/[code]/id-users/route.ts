@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getSessionUser, sessionHas } from "@/lib/auth"
-import { idConnector } from "@/lib/connectors/mock"
+import { idConnector } from "@/lib/connectors"
 import { getStore } from "@/lib/store"
 
 export async function PATCH(
@@ -21,7 +21,7 @@ export async function PATCH(
     return NextResponse.json({ error: "bad request" }, { status: 400 })
   }
 
-  const updated = idConnector.setStatus(body.userId, body.status)
+  const updated = await idConnector.setStatus(body.userId, body.status)
   const store = getStore()
   store.audit.unshift({
     id: store.id(),

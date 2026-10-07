@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server"
 import { jwtVerify } from "jose"
 
 const COOKIE = "pmp_session"
-const PUBLIC = ["/login", "/api/auth/login", "/api/health"]
+const PUBLIC = ["/login", "/api/auth/login", "/api/health", "/api/vps/ingest"]
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl

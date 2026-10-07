@@ -1,30 +1,15 @@
-/** Mock connectors for pnk-id / pnk-mail / VPS — phase 1 */
+/** Mock connectors for pnk-id / pnk-mail — used when admin env is unset */
+import type {
+  BroadcastResult,
+  HealthResult,
+  IdStats,
+  IdUser,
+  MailDomain,
+  MailStats,
+  Mailbox,
+} from "@/lib/connectors/types"
 
-export type IdUser = {
-  id: string
-  username: string
-  email: string
-  status: "active" | "blocked"
-  lastLoginAt: string
-  createdAt: string
-}
-
-export type Mailbox = {
-  id: string
-  address: string
-  owner: string
-  usedMb: number
-  quotaMb: number
-  messages: number
-}
-
-export type MailDomain = {
-  domain: string
-  verified: boolean
-  mx: boolean
-  spf: boolean
-  dkim: boolean
-}
+export type { IdUser, Mailbox, MailDomain } from "@/lib/connectors/types"
 
 const idUsers: IdUser[] = [
   {
@@ -98,16 +83,16 @@ const domains: MailDomain[] = [
   },
 ]
 
-export const idConnector = {
-  listUsers() {
+export const mockIdConnector = {
+  async listUsers(): Promise<IdUser[]> {
     return [...idUsers]
   },
-  setStatus(userId: string, status: IdUser["status"]) {
+  async setStatus(userId: string, status: IdUser["status"]): Promise<IdUser | null> {
     const u = idUsers.find((x) => x.id === userId)
     if (u) u.status = status
     return u ?? null
   },
-  stats() {
+  async stats(): Promise<IdStats> {
     return {
       total: idUsers.length,
       active: idUsers.filter((u) => u.status === "active").length,
@@ -116,30 +101,29 @@ export const idConnector = {
   },
 }
 
-export const mailConnector = {
-  listMailboxes() {
+export const mockMailConnector = {
+  async listMailboxes(): Promise<Mailbox[]> {
     return [...mailboxes]
   },
-  listDomains() {
+  async listDomains(): Promise<MailDomain[]> {
     return [...domains]
   },
-  stats() {
+  async stats(): Promise<MailStats> {
     return {
       mailboxes: mailboxes.length,
       messages: mailboxes.reduce((s, m) => s + m.messages, 0),
       usedMb: mailboxes.reduce((s, m) => s + m.usedMb, 0),
     }
   },
-  async sendBroadcast(subject: string, html: string) {
+  async sendBroadcast(subject: string, html: string): Promise<BroadcastResult> {
     void subject
     void html
     return { ok: true, queued: mailboxes.filter((m) => m.owner !== "system").length }
   },
 }
 
-export const healthConnector = {
-  async check(url: string) {
-    // phase 1: mock latency
+export const mockHealthConnector = {
+  async check(url: string): Promise<HealthResult> {
     void url
     return { ok: true, ms: 40 + Math.floor(Math.random() * 80) }
   },

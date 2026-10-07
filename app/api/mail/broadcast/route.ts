@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getSessionUser, sessionHas } from "@/lib/auth"
-import { mailConnector } from "@/lib/connectors/mock"
+import { mailConnector } from "@/lib/connectors"
 import { getStore } from "@/lib/store"
 
 export async function POST(req: Request) {
