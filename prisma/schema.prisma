@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  login        String   @unique
+  passwordHash String
+  name         String
+  avatarUrl    String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roles            UserRole[]
+  serviceAccess    UserServiceAccess[]
+  auditLogs        AuditLog[]           @relation("ActorLogs")
+  assignedThreads  SupportThread[]      @relation("Assignee")
+  broadcasts       Broadcast[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  name        String
+  description String?
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId String
+  roleId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  name         String
+  description  String?
+  baseUrl      String?
+  capabilities String[] @default([])
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  access UserServiceAccess[]
+}
+
+model UserServiceAccess {
+  id         String   @id @default(cuid())
+  userId     String
+  projectId  String
+  canView    Boolean  @default(true)
+  canManage  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  targetType String?
+  targetId   String?
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("ActorLogs", fields: [actorId], references: [id], onDelete: SetNull)
+}
+
+model SupportThread {
+  id         String   @id @default(cuid())
+  mailbox    String
+  subject    String
+  fromEmail  String
+  fromName   String?
+  status     String   @default("open")
+  priority   String   @default("normal")
+  assigneeId String?
+  lastAt     DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  assignee User?            @relation("Assignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  messages SupportMessage[]
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  direction String
+  fromEmail String
+  bodyHtml  String?
+  bodyText  String
+  createdAt DateTime @default(now())
+
+  thread SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+model Broadcast {
+  id          String   @id @default(cuid())
+  createdById String
+  subject     String
+  bodyHtml    String
+  audience    String   @default("all")
+  status      String   @default("draft")
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model VpsSnapshot {
+  id        String   @id @default(cuid())
+  host      String   @default("pnk-server")
+  cpuPct    Float
+  memPct    Float
+  diskPct   Float
+  load1     Float
+  uptimeSec BigInt
+  netInKbps Float    @default(0)
+  netOutKbps Float   @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([host, createdAt])
+}

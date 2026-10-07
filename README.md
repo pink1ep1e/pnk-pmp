@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# pnk-pmp
 
-## Getting Started
+**Project Management Platform** — внутренняя панель управления сервисами pnk (id, почта, VPS, поддержка).
 
-First, run the development server:
+Дизайн как у [pnk-mail](https://github.com/pink1ep1e/pnk-mail) / [pnk-id](https://github.com/pink1ep1e/pnk-id): тёмный UI, Unbounded + Manrope, `#0066ff`.
+
+## Локально
 
 ```bash
+npm install
+cp .env.example .env
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3200 — демо: **admin** / **admin123**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Фаза 1: in-memory store + mock connectors (UI полностью кликабелен без Postgres).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## VPS (PM2 + nginx)
 
-## Learn More
+Полная инструкция: **[docs/install-vps.md](docs/install-vps.md)**
 
-To learn more about Next.js, take a look at the following resources:
+Кратко:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. `CREATE DATABASE pnk_pmp`
+2. `git clone` → `.env` (`DATABASE_URL`, `JWT_SECRET`)
+3. `npm ci && npm run build` → `pm2 start` на порту **3200**
+4. nginx → `pmp.pnkmail.ru` → `127.0.0.1:3200` + certbot
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Коннекторы
 
-## Deploy on Vercel
+| Сервис | Env | Статус |
+|--------|-----|--------|
+| pnk-id | `ID_ADMIN_URL`, `ID_ADMIN_TOKEN` | mock → фаза 2 |
+| pnk-mail | `MAIL_ADMIN_URL`, `MAIL_ADMIN_TOKEN` | mock → фаза 2 |
+| VPS | `VPS_INGEST_SECRET` | mock → фаза 2 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Скрипты
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Команда | Что делает |
+|---------|------------|
+| `npm run dev` | Next на :3200 |
+| `npm run build` / `start` | прод |
+| `npm run db:generate` | Prisma client |
+| `npm run db:push` | схема → Postgres |
+| `npm run db:seed` | superadmin + роли |
