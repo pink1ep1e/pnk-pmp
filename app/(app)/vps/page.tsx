@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { Cloud, HardDrive } from "@/lib/icons"
-import { PageHeader } from "@/components/pmp/page-header"
-import { Panel } from "@/components/pmp/panel"
+import { RightPanel } from "@/components/pmp/shell-context"
+import { RightStack, SystemStatusWidget } from "@/components/pmp/right-widgets"
+import { MetricCard, PageTitle, Surface } from "@/components/pmp/ui-bits"
 import { formatUptime } from "@/lib/utils"
 
 type Point = {
@@ -13,26 +14,6 @@ type Point = {
   diskPct: number
   load1: number
   uptimeSec: number
-}
-
-function Meter({ label, pct, color }: { label: string; pct: number; color: string }) {
-  const v = Math.min(100, Math.max(0, pct))
-  return (
-    <div className="rounded-[18px] bg-[#1a1c22] p-4">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-[13px] text-white/45">{label}</p>
-        <p className="font-display font-semibold text-[20px] tracking-[-0.02em]">
-          {Math.round(v)}%
-        </p>
-      </div>
-      <div className="h-2 rounded-full bg-[#0f1115] overflow-hidden">
-        <div
-          className="h-full rounded-full transition-[width] duration-500"
-          style={{ width: `${v}%`, background: color }}
-        />
-      </div>
-    </div>
-  )
 }
 
 export default function VpsPage() {
@@ -51,47 +32,54 @@ export default function VpsPage() {
   }, [])
 
   if (!latest) {
-    return <div className="h-40 rounded-[18px] bg-[#1a1c22] animate-pulse" />
+    return <div className="h-40 rounded-[16px] bg-[#12151c] animate-pulse" />
   }
 
   const maxCpu = Math.max(...history.map((h) => h.cpuPct), 1)
 
   return (
-    <div>
-      <PageHeader
+    <>
+      <RightPanel>
+        <RightStack>
+          <SystemStatusWidget />
+        </RightStack>
+      </RightPanel>
+
+      <PageTitle
         title="VPS"
         description={`${host} · live-метрики`}
         actions={
-          <div className="h-10 w-10 rounded-[12px] bg-[#1a1c22] flex items-center justify-center text-white/50">
+          <div className="h-10 w-10 rounded-[12px] bg-[#12151c] flex items-center justify-center text-white/50">
             <HardDrive size={18} />
           </div>
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-        <Meter label="CPU" pct={latest.cpuPct} color="#0066ff" />
-        <Meter label="RAM" pct={latest.memPct} color="#4d9fff" />
-        <Meter label="Disk" pct={latest.diskPct} color="#3dd68c" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <MetricCard label="CPU" value={`${Math.round(latest.cpuPct)}%`} />
+        <MetricCard label="RAM" value={`${Math.round(latest.memPct)}%`} />
+        <MetricCard label="Disk" value={`${Math.round(latest.diskPct)}%`} />
+        <MetricCard label="Uptime" value={formatUptime(latest.uptimeSec)} />
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="rounded-[18px] bg-[#1a1c22] p-4">
-          <p className="text-[13px] text-white/45">Uptime</p>
-          <p className="mt-2 font-display font-semibold text-[22px] tracking-[-0.02em]">
-            {formatUptime(latest.uptimeSec)}
-          </p>
-        </div>
-        <div className="rounded-[18px] bg-[#1a1c22] p-4">
+        <Surface className="p-4">
           <p className="text-[13px] text-white/45 flex items-center gap-1.5">
             <Cloud size={14} /> Load 1m
           </p>
           <p className="mt-2 font-display font-semibold text-[22px] tracking-[-0.02em]">
             {latest.load1.toFixed(2)}
           </p>
-        </div>
+        </Surface>
+        <Surface className="p-4">
+          <p className="text-[13px] text-white/45">Точек в истории</p>
+          <p className="mt-2 font-display font-semibold text-[22px] tracking-[-0.02em]">
+            {history.length}
+          </p>
+        </Surface>
       </div>
 
-      <Panel className="p-4 md:p-5">
+      <Surface className="p-4 md:p-5">
         <h2 className="font-display font-semibold text-[17px] tracking-[-0.02em] mb-4">
           CPU · ~2 часа
         </h2>
@@ -100,12 +88,12 @@ export default function VpsPage() {
             <div
               key={i}
               title={`${Math.round(h.cpuPct)}%`}
-              className="flex-1 rounded-t-[6px] bg-[#0066ff] min-w-0 opacity-90 hover:opacity-100"
+              className="flex-1 rounded-t-[6px] bg-gradient-to-t from-[#0052cc] to-[#4d9fff] min-w-0 opacity-90 hover:opacity-100"
               style={{ height: `${Math.max(4, (h.cpuPct / maxCpu) * 100)}%` }}
             />
           ))}
         </div>
-      </Panel>
-    </div>
+      </Surface>
+    </>
   )
 }

@@ -4,8 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight } from "@/lib/icons"
-import { PageHeader } from "@/components/pmp/page-header"
-import { Panel } from "@/components/pmp/panel"
+import { PageTitle, Surface } from "@/components/pmp/ui-bits"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -51,12 +50,12 @@ export default function SupportThreadPage() {
   }
 
   if (!thread) {
-    return <div className="h-40 rounded-[18px] bg-[#1a1c22] animate-pulse" />
+    return <div className="h-40 rounded-[16px] bg-[#12151c] animate-pulse" />
   }
 
   return (
-    <div>
-      <PageHeader
+    <>
+      <PageTitle
         title={thread.subject}
         description={`${thread.fromName || thread.fromEmail} → ${thread.mailbox}`}
         actions={
@@ -70,13 +69,13 @@ export default function SupportThreadPage() {
         }
       />
 
-      <Panel className="p-4 md:p-5 space-y-3 mb-4">
+      <Surface className="p-4 md:p-5 space-y-3 mb-4">
         {thread.messages.map((m) => (
           <div
             key={m.id}
             className={cn(
               "rounded-[16px] px-4 py-3 max-w-[88%]",
-              m.direction === "in" ? "bg-[#0f1115]" : "bg-[#0066ff]/20 ml-auto",
+              m.direction === "in" ? "bg-[#0a0c12]" : "bg-[#0066ff]/20 ml-auto",
             )}
           >
             <p className="text-[12px] text-white/40 mb-1">{m.fromEmail}</p>
@@ -88,9 +87,9 @@ export default function SupportThreadPage() {
             </p>
           </div>
         ))}
-      </Panel>
+      </Surface>
 
-      <Panel className="p-4 md:p-5">
+      <Surface className="p-4 md:p-5">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -111,7 +110,7 @@ export default function SupportThreadPage() {
             Ответить и закрыть
           </Button>
         </div>
-      </Panel>
-    </div>
+      </Surface>
+    </>
   )
 }

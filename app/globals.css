@@ -87,7 +87,7 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: #07090e;
   color: var(--foreground);
   font-family: var(--font-manrope), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;

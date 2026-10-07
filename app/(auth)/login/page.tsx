@@ -42,7 +42,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-dvh bg-[#0c0d10] text-white flex flex-col">
       <header className="pt-10 pb-6 flex justify-center px-4">
-        <Logo variant="large" href={null} priority className="h-[52px] w-auto max-w-[220px]" />
+        <Logo variant="full" href={null} priority />
       </header>
 
       <main className="flex-1 flex flex-col items-center px-4 pb-10">
