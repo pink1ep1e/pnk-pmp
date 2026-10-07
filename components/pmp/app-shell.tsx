@@ -61,7 +61,7 @@ export function Avatar({
   const letter = (name || "?").trim().charAt(0).toUpperCase()
   return (
     <div
-      className="rounded-full bg-[#1e69ff] flex items-center justify-center overflow-hidden shrink-0 text-white font-semibold"
+      className="rounded-full bg-[#0066ff] flex items-center justify-center overflow-hidden shrink-0 text-white font-semibold"
       style={{ width: size, height: size, fontSize: size * 0.38 }}
     >
       {avatarUrl ? (
@@ -113,14 +113,14 @@ function ShellInner({
   const timeStr = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
 
   return (
-    <div className="h-dvh max-h-dvh bg-[#080b12] text-white flex overflow-hidden">
-      {/* LEFT */}
-      <aside className="hidden lg:flex w-[248px] shrink-0 flex-col px-3 py-4 min-h-0 border-r border-white/[0.04]">
+    <div className="h-dvh max-h-dvh bg-[#0a0c10] text-white flex overflow-hidden">
+      {/* LEFT — like mock: logo, nav, profile */}
+      <aside className="hidden lg:flex w-[240px] shrink-0 flex-col px-3 py-5 min-h-0">
         <div className="px-2 mb-6">
           <Logo variant="full" href="/" priority />
         </div>
 
-        <nav className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-0.5">
+        <nav className="flex-1 min-h-0 overflow-y-auto space-y-1">
           {items.map((item) => {
             const active = isActive(item.href)
             const Icon = item.icon
@@ -130,10 +130,10 @@ function ShellInner({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] font-medium transition-all duration-150",
+                  "w-full flex items-center gap-3 px-3.5 py-[11px] rounded-[14px] text-[14px] font-medium transition-all duration-150",
                   active
-                    ? "bg-[#1e69ff] text-white shadow-[0_0_28px_rgba(30,105,255,0.4)]"
-                    : "text-white/50 hover:bg-white/[0.04] hover:text-white/85",
+                    ? "bg-[#0066ff] text-white shadow-[0_8px_28px_rgba(0,102,255,0.45)]"
+                    : "text-white/50 hover:bg-white/[0.04] hover:text-white/90",
                 )}
               >
                 <Icon size={18} />
@@ -142,7 +142,7 @@ function ShellInner({
                   <span
                     className={cn(
                       "min-w-[22px] h-[22px] px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center",
-                      active ? "bg-white/20 text-white" : "bg-white/[0.08] text-white/65",
+                      active ? "bg-white/25 text-white" : "bg-[#1a1d26] text-white/70",
                     )}
                   >
                     {badge > 999 ? "999+" : badge}
@@ -153,10 +153,10 @@ function ShellInner({
           })}
         </nav>
 
-        <div className="mt-3 space-y-2">
+        <div className="mt-4 space-y-2 px-0.5">
           <Link
             href="/settings"
-            className="flex items-center gap-2.5 rounded-[14px] bg-[#0f131a] border border-white/[0.06] p-3 hover:bg-[#121722] transition-colors"
+            className="flex items-center gap-2.5 rounded-[16px] bg-[#12151c] p-3 hover:bg-[#161a22] transition-colors"
           >
             <Avatar name={user.name} avatarUrl={user.avatarUrl} size={40} />
             <div className="min-w-0 flex-1">
@@ -168,42 +168,44 @@ function ShellInner({
           <button
             type="button"
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 h-10 rounded-[12px] text-[13px] text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors"
+            className="w-full flex items-center justify-center gap-2 h-10 rounded-[12px] text-[13px] text-white/45 hover:text-white hover:bg-white/[0.04] transition-colors"
           >
             <LogOut size={15} />
             Выйти
           </button>
-          <p className="px-1 pt-1 text-[10px] text-white/25 text-center leading-relaxed">
-            PNK PMP © 2026 · pnk-studios
+          <p className="pt-1 text-center text-[10px] leading-relaxed text-white/25">
+            PNK PMP © 2026
+            <br />
+            pnk.studios
           </p>
         </div>
       </aside>
 
       {/* CENTER + RIGHT */}
-      <div className="flex-1 min-w-0 flex flex-col min-h-0">
-        <header className="shrink-0 flex items-center gap-3 px-4 lg:px-6 py-3.5 border-b border-white/[0.04]">
+      <div className="flex-1 min-w-0 flex flex-col min-h-0 bg-[#0a0c10]">
+        <header className="shrink-0 flex items-center gap-3 px-4 lg:px-5 py-3.5">
           <div className="lg:hidden">
             <Logo variant="mark" href="/" width={28} height={28} />
           </div>
-          <div className="flex-1 flex items-center gap-2.5 h-11 rounded-full bg-[#0f131a] border border-white/[0.06] px-4 max-w-[580px]">
-            <Search size={16} className="text-white/35 shrink-0" />
+          <div className="flex-1 flex items-center gap-2.5 h-11 rounded-full bg-[#12151c] px-4 max-w-[520px]">
+            <Search size={16} className="text-white/30 shrink-0" />
             <input
               placeholder={searchPlaceholder}
-              className="flex-1 bg-transparent outline-none text-[14px] placeholder:text-white/30 min-w-0"
+              className="flex-1 bg-transparent outline-none text-[14px] placeholder:text-white/28 min-w-0"
             />
           </div>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             <button
               type="button"
-              className="h-10 w-10 rounded-full bg-[#0f131a] border border-white/[0.06] flex items-center justify-center text-white/45 hover:text-white relative"
+              className="relative h-10 w-10 rounded-full bg-[#12151c] flex items-center justify-center text-white/45 hover:text-white"
               aria-label="Уведомления"
             >
               <Bell size={17} />
-              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#1e69ff] ring-2 ring-[#080b12]" />
+              <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-[#0066ff]" />
             </button>
             <button
               type="button"
-              className="h-10 w-10 rounded-full bg-[#0f131a] border border-white/[0.06] flex items-center justify-center text-white/45 hover:text-white"
+              className="h-10 w-10 rounded-full bg-[#12151c] flex items-center justify-center text-white/45 hover:text-white"
               aria-label="Тема"
             >
               <MoonIcon size={17} />
@@ -211,7 +213,7 @@ function ShellInner({
             <Link href="/settings" className="hidden sm:block">
               <Avatar name={user.name} avatarUrl={user.avatarUrl} size={36} />
             </Link>
-            <div className="hidden md:block text-right pl-1 min-w-[120px]">
+            <div className="hidden md:block text-right pl-1.5 min-w-[118px]">
               <p className="text-[12px] text-white/65 leading-tight">{dateStr}</p>
               <p className="text-[11px] text-white/30">{timeStr}</p>
             </div>
@@ -219,20 +221,19 @@ function ShellInner({
         </header>
 
         <div className="flex-1 min-h-0 flex overflow-hidden">
-          <main className="flex-1 min-w-0 overflow-y-auto px-4 lg:px-6 py-5 pb-24 lg:pb-6">
+          <main className="flex-1 min-w-0 overflow-y-auto px-4 lg:px-5 pb-24 lg:pb-6">
             {children}
           </main>
 
           {right ? (
-            <aside className="hidden xl:block w-[340px] shrink-0 overflow-y-auto border-l border-white/[0.04] px-4 py-5 space-y-3">
+            <aside className="hidden xl:flex w-[320px] shrink-0 flex-col overflow-y-auto pr-4 pb-6 pl-1 gap-3">
               {right}
             </aside>
           ) : null}
         </div>
       </div>
 
-      {/* MOBILE TAB BAR */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5 bg-[#0b0e16] border-t border-white/[0.06] pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 grid grid-cols-5 bg-[#0d1017] border-t border-white/[0.06] pb-[env(safe-area-inset-bottom)]">
         {items
           .filter((i) => ["/", "/services", "/mail", "/support", "/settings"].includes(i.href))
           .slice(0, 5)
@@ -245,7 +246,7 @@ function ShellInner({
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center justify-center gap-1 py-2.5",
-                  active ? "text-[#1e69ff]" : "text-white/40",
+                  active ? "text-[#0066ff]" : "text-white/40",
                 )}
               >
                 <Icon size={20} />

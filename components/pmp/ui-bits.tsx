@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 export function Sparkline({
   points,
   className,
-  color = "#1e69ff",
+  color = "#0066ff",
   fill = true,
 }: {
   points: number[]
@@ -28,8 +28,8 @@ export function Sparkline({
 
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className={cn("w-full h-8", className)} preserveAspectRatio="none">
-      {fill ? <path d={area} fill={color} opacity="0.18" /> : null}
-      <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      {fill ? <path d={area} fill={color} opacity="0.2" /> : null}
+      <path d={line} fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -37,7 +37,7 @@ export function Sparkline({
 export function Trend({ value, suffix = "%" }: { value: number; suffix?: string }) {
   const up = value >= 0
   return (
-    <span className={cn("text-[12px] font-semibold", up ? "text-[#22c55e]" : "text-[#ef4444]")}>
+    <span className={cn("text-[12px] font-semibold", up ? "text-[#3dd68c]" : "text-[#ff5c5c]")}>
       {up ? "+" : ""}
       {value}
       {suffix}
@@ -53,14 +53,14 @@ export function StatusDot({
   label: string
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[13px] font-medium">
+    <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold">
       <span
         className={cn(
-          "h-2 w-2 rounded-full",
-          ok !== false ? "bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.45)]" : "bg-[#ef4444]",
+          "h-1.5 w-1.5 rounded-full",
+          ok !== false ? "bg-[#3dd68c] shadow-[0_0_8px_rgba(61,214,140,0.55)]" : "bg-[#ff5c5c]",
         )}
       />
-      <span className={ok !== false ? "text-[#22c55e]" : "text-[#ef4444]"}>{label}</span>
+      <span className={ok !== false ? "text-[#3dd68c]" : "text-[#ff5c5c]"}>{label}</span>
     </span>
   )
 }
@@ -73,11 +73,11 @@ export function Pill({
   tone?: "neutral" | "blue" | "red" | "green" | "amber"
 }) {
   const tones = {
-    neutral: "bg-white/[0.06] text-white/65 border border-white/[0.06]",
-    blue: "bg-[#1e69ff]/15 text-[#6ba3ff] border border-[#1e69ff]/20",
-    red: "bg-[#ef4444]/15 text-[#f87171] border border-[#ef4444]/20",
-    green: "bg-[#22c55e]/15 text-[#4ade80] border border-[#22c55e]/20",
-    amber: "bg-[#f59e0b]/15 text-[#fbbf24] border border-[#f59e0b]/20",
+    neutral: "bg-white/[0.06] text-white/65",
+    blue: "bg-[#0066ff]/18 text-[#4d9fff]",
+    red: "bg-[#ff5c5c]/15 text-[#ff8a8a]",
+    green: "bg-[#3dd68c]/15 text-[#3dd68c]",
+    amber: "bg-[#f5a524]/15 text-[#f5a524]",
   }
   return (
     <span className={cn("rounded-full px-2.5 py-0.5 text-[11px] font-semibold", tones[tone])}>
@@ -89,7 +89,7 @@ export function Pill({
 export function IconWell({
   children,
   className,
-  color = "bg-[#1e69ff]/15 text-[#6ba3ff]",
+  color = "bg-[#0066ff]/15 text-[#4d9fff]",
 }: {
   children: React.ReactNode
   className?: string
@@ -115,16 +115,7 @@ export function Surface({
   children: React.ReactNode
   className?: string
 }) {
-  return (
-    <div
-      className={cn(
-        "rounded-[16px] bg-[#0f131a] border border-white/[0.06]",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  )
+  return <div className={cn("rounded-[16px] bg-[#12151c]", className)}>{children}</div>
 }
 
 export function MetricCard({
@@ -147,7 +138,7 @@ export function MetricCard({
   footer?: React.ReactNode
 }) {
   return (
-    <Surface className="p-4">
+    <Surface className="p-4 !rounded-[18px]">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {icon}
@@ -164,7 +155,7 @@ export function MetricCard({
           {footer}
         </div>
         {spark ? (
-          <div className="w-[80px] shrink-0 opacity-95">
+          <div className="w-[84px] shrink-0 opacity-95">
             <Sparkline points={spark} color={sparkColor} />
           </div>
         ) : null}
@@ -188,7 +179,7 @@ export function PageTitle({
     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-5">
       <div className="flex items-start gap-3 min-w-0">
         {icon ? (
-          <div className="h-11 w-11 rounded-[14px] bg-[#1e69ff]/15 text-[#6ba3ff] flex items-center justify-center shrink-0">
+          <div className="h-11 w-11 rounded-[14px] bg-[#0066ff]/15 text-[#4d9fff] flex items-center justify-center shrink-0">
             {icon}
           </div>
         ) : null}
@@ -250,7 +241,7 @@ export function Td({ children, className }: { children?: React.ReactNode; classN
 export function RingProgress({
   value,
   size = 72,
-  color = "#1e69ff",
+  color = "#0066ff",
   label,
 }: {
   value: number
@@ -264,21 +255,21 @@ export function RingProgress({
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-        <circle cx="18" cy="18" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+        <circle cx="18" cy="18" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3.2" />
         <circle
           cx="18"
           cy="18"
           r={r}
           fill="none"
           stroke={color}
-          strokeWidth="3"
+          strokeWidth="3.2"
           strokeDasharray={`${(v / 100) * c} ${c}`}
           strokeLinecap="round"
         />
       </svg>
       <span className="absolute inset-0 flex flex-col items-center justify-center text-center leading-tight">
-        <span className="text-[13px] font-semibold">{Math.round(v)}%</span>
-        {label ? <span className="text-[9px] text-white/35 px-1">{label}</span> : null}
+        <span className="text-[15px] font-semibold">{Math.round(v)}%</span>
+        {label ? <span className="text-[9px] text-white/35 px-1 mt-0.5">{label}</span> : null}
       </span>
     </div>
   )
@@ -303,14 +294,14 @@ export function Pagination({
             type="button"
             className={cn(
               "h-8 min-w-8 px-2 rounded-[8px] text-[13px] font-semibold",
-              p === page ? "bg-[#1e69ff] text-white" : "text-white/40 hover:text-white hover:bg-white/[0.04]",
+              p === page ? "bg-[#0066ff] text-white" : "text-white/40 hover:text-white hover:bg-white/[0.04]",
             )}
           >
             {p}
           </button>
         ))}
       </div>
-      <select className="h-8 rounded-[8px] bg-[#0a0d14] border border-white/[0.06] px-2 text-[12px] text-white/50 outline-none">
+      <select className="h-8 rounded-[8px] bg-[#0a0c10] px-2 text-[12px] text-white/50 outline-none">
         <option>{perPage} на странице</option>
         <option>25 на странице</option>
         <option>50 на странице</option>
@@ -333,7 +324,7 @@ export function AreaChart({
   function path(points: number[], fill = false) {
     const coords = points.map((p, i) => {
       const x = (i / Math.max(points.length - 1, 1)) * w
-      const y = h - (p / max) * (h - 20) - 10
+      const y = h - (p / max) * (h - 24) - 12
       return [x, y] as const
     })
     const line = coords
@@ -347,7 +338,7 @@ export function AreaChart({
     <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }} preserveAspectRatio="none">
       {series.map((s, i) => (
         <g key={i}>
-          <path d={path(s.points, true)} fill={s.color} opacity="0.12" />
+          <path d={path(s.points, true)} fill={s.color} opacity="0.1" />
           <path d={path(s.points)} fill="none" stroke={s.color} strokeWidth="2.5" strokeLinecap="round" />
         </g>
       ))}

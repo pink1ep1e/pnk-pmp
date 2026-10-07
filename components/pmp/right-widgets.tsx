@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import {
+  ArrowRight,
   Bell,
   HardDrive,
   Lock,
@@ -45,22 +46,22 @@ export function SupportWidget({
   const open = threads.filter((t) => t.status !== "closed").length
   const important = threads.filter((t) => t.priority === "high").length
   return (
-    <Surface>
+    <Surface className="!rounded-[18px]">
       <WidgetTitle>Последние письма поддержки</WidgetTitle>
       <div className="px-4 pb-2 flex flex-wrap gap-1.5">
         <Pill tone="blue">Все {threads.length || 36}</Pill>
-        <Pill tone="neutral">Непрочит. {open || 12}</Pill>
+        <Pill tone="neutral">Непрочитанные {open || 12}</Pill>
         <Pill tone="red">Важные {important || 3}</Pill>
       </div>
       <div>
-        {threads.slice(0, 4).map((t) => (
+        {(threads.length ? threads : []).slice(0, 4).map((t) => (
           <Link
             key={t.id}
             href={`/support/${t.id}`}
             className="block px-4 py-3 hover:bg-white/[0.03] transition-colors border-t border-white/[0.04]"
           >
             <div className="flex items-start gap-2.5">
-              <div className="h-8 w-8 rounded-[10px] bg-[#1e69ff]/15 text-[#6ba3ff] flex items-center justify-center shrink-0 mt-0.5">
+              <div className="h-8 w-8 rounded-[10px] bg-[#0066ff]/15 text-[#4d9fff] flex items-center justify-center shrink-0 mt-0.5">
                 <Mail size={14} />
               </div>
               <div className="min-w-0 flex-1">
@@ -78,7 +79,7 @@ export function SupportWidget({
       </div>
       <Link
         href="/support"
-        className="block px-4 py-3 text-[13px] text-[#6ba3ff] border-t border-white/[0.04] hover:text-white"
+        className="block px-4 py-3 text-[13px] text-[#4d9fff] border-t border-white/[0.04] hover:text-white"
       >
         Все тикеты →
       </Link>
@@ -97,32 +98,29 @@ export function VpsWidget({
 }) {
   const total = Math.round((cpu + mem + disk) / 3)
   return (
-    <Surface>
+    <Surface className="!rounded-[18px]">
       <WidgetTitle>Нагрузка VPS</WidgetTitle>
       <div className="flex items-center gap-4 px-4 pb-3">
         <RingProgress value={total} size={84} label="Общая" />
         <div className="flex-1 space-y-2.5">
           {[
-            { label: "CPU", v: cpu, c: "#1e69ff" },
-            { label: "RAM", v: mem, c: "#6ba3ff" },
-            { label: "Disk", v: disk, c: "#22c55e" },
+            { label: "CPU", v: cpu, c: "#0066ff" },
+            { label: "RAM", v: mem, c: "#4d9fff" },
+            { label: "Disk", v: disk, c: "#3dd68c" },
           ].map((m) => (
             <div key={m.label}>
               <div className="flex justify-between text-[11px] text-white/45 mb-1">
                 <span>{m.label}</span>
                 <span className="text-white/70 font-medium">{Math.round(m.v)}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+              <div className="h-1.5 rounded-full bg-[#0a0c10] overflow-hidden">
                 <div className="h-full rounded-full" style={{ width: `${m.v}%`, background: m.c }} />
               </div>
             </div>
           ))}
         </div>
       </div>
-      <Link
-        href="/vps"
-        className="block px-4 py-3 text-[13px] text-[#6ba3ff] border-t border-white/[0.04] hover:text-white"
-      >
+      <Link href="/vps" className="block px-4 py-3 text-[13px] text-[#4d9fff] border-t border-white/[0.04]">
         Подробнее →
       </Link>
     </Surface>
@@ -137,7 +135,7 @@ export function QuickActionsWidget() {
     { label: "Перезапустить VPS", icon: RefreshCw, href: "/vps" },
   ]
   return (
-    <Surface>
+    <Surface className="!rounded-[18px]">
       <WidgetTitle>Быстрые действия</WidgetTitle>
       <div className="px-2 pb-2 space-y-0.5">
         {actions.map((a) => {
@@ -148,8 +146,8 @@ export function QuickActionsWidget() {
               href={a.href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-white/[0.04] text-[13px] text-white/75 transition-colors"
             >
-              <span className="h-8 w-8 rounded-[10px] bg-white/[0.04] flex items-center justify-center">
-                <Icon size={15} className="text-white/50" />
+              <span className="h-8 w-8 rounded-[10px] bg-[#0066ff]/12 text-[#4d9fff] flex items-center justify-center">
+                <Icon size={15} />
               </span>
               {a.label}
             </Link>
@@ -166,17 +164,9 @@ export function AuditWidget({
   audit: { actorLogin: string; action: string; createdAt: string }[]
 }) {
   return (
-    <Surface>
-      <WidgetTitle
-        action={
-          <Link href="/roles" className="text-[12px] text-[#6ba3ff]">
-            Все события →
-          </Link>
-        }
-      >
-        Недавние действия
-      </WidgetTitle>
-      <div className="px-4 pb-4 space-y-3">
+    <Surface className="!rounded-[18px]">
+      <WidgetTitle>Последние действия</WidgetTitle>
+      <div className="px-4 pb-3 space-y-3">
         {audit.slice(0, 5).map((a, i) => (
           <div key={i} className="flex gap-2.5">
             <div className="h-8 w-8 rounded-[10px] bg-white/[0.04] flex items-center justify-center shrink-0">
@@ -184,7 +174,7 @@ export function AuditWidget({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[13px] leading-snug">
-                <span className="text-[#6ba3ff]">@{a.actorLogin}</span> · {a.action}
+                <span className="text-[#4d9fff]">@{a.actorLogin}</span> · {a.action}
               </p>
               <p className="text-[11px] text-white/30 mt-0.5">{formatAgo(a.createdAt)}</p>
             </div>
@@ -192,6 +182,12 @@ export function AuditWidget({
         ))}
         {!audit.length ? <p className="text-[13px] text-white/35">Нет событий</p> : null}
       </div>
+      <Link
+        href="/roles"
+        className="block px-4 py-3 text-[13px] text-[#4d9fff] border-t border-white/[0.04]"
+      >
+        Журнал →
+      </Link>
     </Surface>
   )
 }
@@ -204,7 +200,7 @@ export function SystemStatusWidget() {
     { name: "База данных", ok: true, uptime: "99.9%" },
   ]
   return (
-    <Surface>
+    <Surface className="!rounded-[18px]">
       <WidgetTitle>Системы и статус</WidgetTitle>
       <div className="px-4 pb-4 space-y-3">
         {systems.map((s) => (
@@ -240,10 +236,10 @@ export function ProfileWidget({
     { href: "/settings", label: "Настройки", icon: Settings },
   ]
   return (
-    <Surface>
+    <Surface className="!rounded-[18px]">
       <WidgetTitle>Мой профиль</WidgetTitle>
-      <div className="px-4 pb-2 flex flex-col items-center text-center">
-        <div className="h-16 w-16 rounded-full bg-[#1e69ff] overflow-hidden flex items-center justify-center text-[24px] font-semibold ring-4 ring-[#1e69ff]/20">
+      <div className="px-4 pb-3 flex items-center gap-3">
+        <div className="h-14 w-14 rounded-full bg-[#0066ff] overflow-hidden flex items-center justify-center text-[22px] font-semibold shadow-[0_0_24px_rgba(0,102,255,0.35)]">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -251,8 +247,10 @@ export function ProfileWidget({
             letter
           )}
         </div>
-        <p className="mt-3 font-semibold text-[15px]">{name}</p>
-        <p className="text-[12px] text-white/40">{role}</p>
+        <div className="min-w-0">
+          <p className="font-semibold text-[15px] truncate">{name}</p>
+          <p className="text-[12px] text-white/40">{role}</p>
+        </div>
       </div>
       <div className="px-2 pb-3 space-y-0.5">
         {links.map((l) => {
@@ -261,10 +259,11 @@ export function ProfileWidget({
             <Link
               key={l.label}
               href={l.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-[10px] hover:bg-white/[0.04] text-[13px] text-white/65"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-white/[0.04] text-[13px] text-white/70"
             >
               <Icon size={15} className="text-white/40" />
-              {l.label}
+              <span className="flex-1">{l.label}</span>
+              <ArrowRight size={12} className="text-white/20" />
             </Link>
           )
         })}
