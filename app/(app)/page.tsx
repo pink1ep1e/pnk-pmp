@@ -47,11 +47,14 @@ const CHART = {
 
 function HeroPmpMark() {
   return (
-    <div className="relative h-[88px] w-[88px] shrink-0">
-      <div className="absolute inset-[-18%] rounded-[28px] bg-[#0066ff]/35 blur-2xl" />
-      <div className="relative h-full w-full rounded-[22px] bg-gradient-to-br from-[#3d8bff] to-[#0052cc] shadow-[0_12px_40px_rgba(0,102,255,0.55)] flex items-center justify-center">
-        <Mail size={40} className="text-white drop-shadow-sm" />
+    <div className="relative h-[72px] w-[118px] shrink-0 flex items-center">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 h-[72px] w-[72px] rounded-[20px] bg-[#0066ff]/40 blur-2xl" />
+      <div className="relative z-[1] h-[72px] w-[72px] rounded-[20px] bg-gradient-to-br from-[#3d8bff] via-[#0066ff] to-[#0047b3] shadow-[0_10px_36px_rgba(0,102,255,0.55)] flex items-center justify-center">
+        <Mail size={32} className="text-white" />
       </div>
+      <span className="absolute left-[52px] top-1/2 -translate-y-1/2 z-[2] rounded-full bg-[#1a1f2e]/90 backdrop-blur-md px-3 py-1.5 text-[12px] font-bold tracking-wide text-[#9ec2ff] shadow-[0_4px_20px_rgba(0,0,0,0.35)]">
+        PMP
+      </span>
     </div>
   )
 }
@@ -117,27 +120,31 @@ export default function DashboardPage() {
         </RightStack>
       </RightPanel>
 
-      {/* HERO — greeting + glowing PMP mark + active services */}
-      <div className="mb-4 flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-8">
+      {/* HERO — greeting | PMP mark | active services card (no borders) */}
+      <div className="mb-5 flex flex-col xl:flex-row xl:items-center gap-5 xl:gap-6">
         <div className="min-w-0 flex-1">
-          <h1 className="font-display font-semibold text-[30px] md:text-[34px] tracking-[-0.04em] leading-none">
-            Привет, {firstName} 👋
+          <h1 className="font-display font-semibold text-[28px] md:text-[32px] tracking-[-0.04em] leading-tight">
+            Привет, <span className="text-[#0066ff]">{firstName}</span> 👋
           </h1>
-          <p className="mt-3 text-[14px] text-white/45 max-w-[460px] leading-relaxed">
+          <p className="mt-2.5 text-[14px] text-white/40 max-w-[440px] leading-relaxed">
             Добро пожаловать в PNK PMP — платформу управления всеми сервисами экосистемы.
           </p>
         </div>
 
-        <div className="flex items-center gap-5 shrink-0">
+        <div className="hidden md:flex shrink-0 justify-center px-2">
           <HeroPmpMark />
-          <div>
-            <p className="text-[12px] text-white/40">Активные сервисы</p>
-            <p className="font-display font-semibold text-[28px] tracking-[-0.03em] leading-none mt-1">
+        </div>
+
+        <div className="shrink-0 w-full sm:w-auto sm:min-w-[220px] rounded-[18px] bg-[#12151c] px-4 py-3.5 flex flex-col justify-between gap-3">
+          <p className="text-[12px] text-white/40">Активные сервисы</p>
+          <div className="flex items-end justify-between gap-3">
+            <p className="font-display font-semibold text-[26px] tracking-[-0.03em] leading-none flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#3dd68c] shadow-[0_0_8px_rgba(61,214,140,0.6)]" />
               {healthy} / {totalServices}
             </p>
             <Link
               href="/services"
-              className="mt-2 inline-flex items-center gap-1 text-[13px] text-[#4d9fff] hover:text-white"
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-[#0066ff] hover:text-[#4d9fff] pb-0.5"
             >
               Управление <ArrowRight size={12} />
             </Link>
