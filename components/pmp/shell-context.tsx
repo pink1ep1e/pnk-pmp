@@ -45,3 +45,13 @@ export function RightPanel({ children }: { children: ReactNode }) {
   }, [children, setRight])
   return null
 }
+
+/** Set header search placeholder while mounted */
+export function SearchPlaceholder({ value }: { value: string }) {
+  const { setSearchPlaceholder } = useShell()
+  useEffect(() => {
+    setSearchPlaceholder(value)
+    return () => setSearchPlaceholder("Поиск по проектам, пользователям, сервисам…")
+  }, [value, setSearchPlaceholder])
+  return null
+}

@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Camera, Lock, Pencil, User } from "@/lib/icons"
+import { Camera, Lock, Pencil, Settings, User } from "@/lib/icons"
+import { SearchPlaceholder } from "@/components/pmp/shell-context"
 import { PageTitle, Surface } from "@/components/pmp/ui-bits"
 import { Button } from "@/components/ui/button"
 
@@ -77,14 +78,19 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <PageTitle title="Настройки" description="Профиль и безопасность" />
+      <SearchPlaceholder value="Поиск по настройкам…" />
+      <PageTitle
+        title="Настройки"
+        description="Профиль, аватар и безопасность аккаунта PMP"
+        icon={<Settings size={20} />}
+      />
 
       <button
         type="button"
         onClick={() => setEditing(true)}
-        className="w-full rounded-[16px] bg-[#12151c] p-4 md:p-5 flex items-center gap-4 text-left hover:bg-[#161a22] transition-colors mb-4"
+        className="w-full rounded-[16px] bg-[#0f131a] border border-white/[0.06] p-4 md:p-5 flex items-center gap-4 text-left hover:bg-[#121722] transition-colors mb-4"
       >
-        <div className="h-16 w-16 rounded-[18px] bg-[#0066ff] overflow-hidden flex items-center justify-center text-[28px] font-semibold shrink-0">
+        <div className="h-16 w-16 rounded-[18px] bg-[#1e69ff] overflow-hidden flex items-center justify-center text-[28px] font-semibold shrink-0">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -98,10 +104,10 @@ export default function SettingsPage() {
           </p>
           <p className="mt-1 text-[14px] text-white/45">@{login}</p>
           {roles.length ? (
-            <p className="mt-2 text-[12px] text-[#4d9fff]">{roles.join(" · ")}</p>
+            <p className="mt-2 text-[12px] text-[#6ba3ff]">{roles.join(" · ")}</p>
           ) : null}
         </div>
-        <div className="h-10 w-10 rounded-full bg-[#0a0c12] flex items-center justify-center text-white/50">
+        <div className="h-10 w-10 rounded-full bg-[#0a0d14] border border-white/[0.06] flex items-center justify-center text-white/50">
           <Pencil size={16} />
         </div>
       </button>
@@ -110,7 +116,7 @@ export default function SettingsPage() {
         <Surface className="mb-4 p-4 md:p-5 space-y-4">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="h-[72px] w-[72px] rounded-[18px] bg-[#0066ff] overflow-hidden flex items-center justify-center text-[28px] font-semibold">
+              <div className="h-[72px] w-[72px] rounded-[18px] bg-[#1e69ff] overflow-hidden flex items-center justify-center text-[28px] font-semibold">
                 {avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -121,7 +127,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-[#0066ff] flex items-center justify-center"
+                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-[#1e69ff] flex items-center justify-center"
               >
                 <Camera size={14} />
               </button>
@@ -137,7 +143,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="text-[14px] text-[#4d9fff] font-medium"
+                className="text-[14px] text-[#6ba3ff] font-medium"
               >
                 Загрузить фото
               </button>

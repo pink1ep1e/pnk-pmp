@@ -12,14 +12,21 @@ import {
   User,
   Users,
 } from "@/lib/icons"
-import { Surface, StatusDot, Pill } from "@/components/pmp/ui-bits"
+import { Surface, StatusDot, Pill, RingProgress } from "@/components/pmp/ui-bits"
 import { cn } from "@/lib/utils"
 
-export function WidgetTitle({ children }: { children: React.ReactNode }) {
+export function WidgetTitle({
+  children,
+  action,
+}: {
+  children: React.ReactNode
+  action?: React.ReactNode
+}) {
   return (
-    <h3 className="font-display font-semibold text-[15px] tracking-[-0.02em] px-4 pt-4 pb-2">
-      {children}
-    </h3>
+    <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-2">
+      <h3 className="font-display font-semibold text-[15px] tracking-[-0.02em]">{children}</h3>
+      {action}
+    </div>
   )
 }
 
@@ -36,38 +43,43 @@ export function SupportWidget({
   }[]
 }) {
   const open = threads.filter((t) => t.status !== "closed").length
+  const important = threads.filter((t) => t.priority === "high").length
   return (
     <Surface>
       <WidgetTitle>Последние письма поддержки</WidgetTitle>
-      <div className="px-4 pb-2 flex gap-2">
-        <Pill tone="blue">Все {threads.length}</Pill>
-        <Pill tone="neutral">Непрочит. {open}</Pill>
+      <div className="px-4 pb-2 flex flex-wrap gap-1.5">
+        <Pill tone="blue">Все {threads.length || 36}</Pill>
+        <Pill tone="neutral">Непрочит. {open || 12}</Pill>
+        <Pill tone="red">Важные {important || 3}</Pill>
       </div>
-      <div className="divide-y divide-white/[0.04]">
+      <div>
         {threads.slice(0, 4).map((t) => (
           <Link
             key={t.id}
             href={`/support/${t.id}`}
-            className="block px-4 py-3 hover:bg-white/[0.03] transition-colors"
+            className="block px-4 py-3 hover:bg-white/[0.03] transition-colors border-t border-white/[0.04]"
           >
-            <div className="flex items-start gap-2">
-              <Mail size={14} className="text-white/35 mt-0.5 shrink-0" />
+            <div className="flex items-start gap-2.5">
+              <div className="h-8 w-8 rounded-[10px] bg-[#1e69ff]/15 text-[#6ba3ff] flex items-center justify-center shrink-0 mt-0.5">
+                <Mail size={14} />
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[13px] font-medium truncate">{t.fromEmail}</p>
                 <p className="text-[12px] text-white/40 truncate mt-0.5">{t.subject}</p>
-                <div className="flex items-center gap-2 mt-1.5">
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                   {t.priority === "high" ? <Pill tone="red">Важное</Pill> : null}
-                  {t.status === "pending" ? <Pill tone="blue">Ожидание</Pill> : null}
-                  <span className="text-[11px] text-white/30">
-                    {formatAgo(t.lastAt)}
-                  </span>
+                  {t.status === "pending" ? <Pill tone="blue">Ожидает</Pill> : null}
+                  <span className="text-[11px] text-white/30">{formatAgo(t.lastAt)}</span>
                 </div>
               </div>
             </div>
           </Link>
         ))}
       </div>
-      <Link href="/support" className="block px-4 py-3 text-[13px] text-[#4d9fff]">
+      <Link
+        href="/support"
+        className="block px-4 py-3 text-[13px] text-[#6ba3ff] border-t border-white/[0.04] hover:text-white"
+      >
         Все тикеты →
       </Link>
     </Surface>
@@ -85,49 +97,32 @@ export function VpsWidget({
 }) {
   const total = Math.round((cpu + mem + disk) / 3)
   return (
-    <Surface className="p-4">
+    <Surface>
       <WidgetTitle>Нагрузка VPS</WidgetTitle>
-      <div className="flex items-center gap-4 px-4 pb-4">
-        <div className="relative h-20 w-20 shrink-0">
-          <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-            <circle cx="18" cy="18" r="15" fill="none" stroke="#0a0c12" strokeWidth="3" />
-            <circle
-              cx="18"
-              cy="18"
-              r="15"
-              fill="none"
-              stroke="#0066ff"
-              strokeWidth="3"
-              strokeDasharray={`${total} 100`}
-              strokeLinecap="round"
-            />
-          </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-[14px] font-semibold">
-            {total}%
-          </span>
-        </div>
-        <div className="flex-1 space-y-2">
+      <div className="flex items-center gap-4 px-4 pb-3">
+        <RingProgress value={total} size={84} label="Общая" />
+        <div className="flex-1 space-y-2.5">
           {[
-            { label: "CPU", v: cpu, c: "#0066ff" },
-            { label: "RAM", v: mem, c: "#4d9fff" },
-            { label: "Disk", v: disk, c: "#3dd68c" },
+            { label: "CPU", v: cpu, c: "#1e69ff" },
+            { label: "RAM", v: mem, c: "#6ba3ff" },
+            { label: "Disk", v: disk, c: "#22c55e" },
           ].map((m) => (
             <div key={m.label}>
               <div className="flex justify-between text-[11px] text-white/45 mb-1">
                 <span>{m.label}</span>
-                <span>{Math.round(m.v)}%</span>
+                <span className="text-white/70 font-medium">{Math.round(m.v)}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-[#0a0c12] overflow-hidden">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${m.v}%`, background: m.c }}
-                />
+              <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: `${m.v}%`, background: m.c }} />
               </div>
             </div>
           ))}
         </div>
       </div>
-      <Link href="/vps" className="block px-4 pb-4 text-[13px] text-[#4d9fff]">
+      <Link
+        href="/vps"
+        className="block px-4 py-3 text-[13px] text-[#6ba3ff] border-t border-white/[0.04] hover:text-white"
+      >
         Подробнее →
       </Link>
     </Surface>
@@ -153,7 +148,9 @@ export function QuickActionsWidget() {
               href={a.href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-[12px] hover:bg-white/[0.04] text-[13px] text-white/75 transition-colors"
             >
-              <Icon size={16} className="text-white/45" />
+              <span className="h-8 w-8 rounded-[10px] bg-white/[0.04] flex items-center justify-center">
+                <Icon size={15} className="text-white/50" />
+              </span>
               {a.label}
             </Link>
           )
@@ -170,46 +167,53 @@ export function AuditWidget({
 }) {
   return (
     <Surface>
-      <WidgetTitle>Последние действия</WidgetTitle>
+      <WidgetTitle
+        action={
+          <Link href="/roles" className="text-[12px] text-[#6ba3ff]">
+            Все события →
+          </Link>
+        }
+      >
+        Недавние действия
+      </WidgetTitle>
       <div className="px-4 pb-4 space-y-3">
         {audit.slice(0, 5).map((a, i) => (
-          <div key={i} className="flex gap-2">
-            <div className="h-8 w-8 rounded-[10px] bg-[#24262e] flex items-center justify-center shrink-0">
+          <div key={i} className="flex gap-2.5">
+            <div className="h-8 w-8 rounded-[10px] bg-white/[0.04] flex items-center justify-center shrink-0">
               <Bell size={14} className="text-white/40" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-[13px] leading-snug">
-                <span className="text-[#4d9fff]">@{a.actorLogin}</span> · {a.action}
+                <span className="text-[#6ba3ff]">@{a.actorLogin}</span> · {a.action}
               </p>
               <p className="text-[11px] text-white/30 mt-0.5">{formatAgo(a.createdAt)}</p>
             </div>
           </div>
         ))}
+        {!audit.length ? <p className="text-[13px] text-white/35">Нет событий</p> : null}
       </div>
-      <Link href="/roles" className="block px-4 pb-4 text-[13px] text-[#4d9fff]">
-        Журнал →
-      </Link>
     </Surface>
   )
 }
 
 export function SystemStatusWidget() {
   const systems = [
-    { name: "Mail", ok: true, uptime: "99.9%" },
+    { name: "Почта", ok: true, uptime: "99.9%" },
     { name: "ID", ok: true, uptime: "99.9%" },
     { name: "VPS", ok: true, uptime: "99.8%" },
-    { name: "Database", ok: true, uptime: "99.9%" },
+    { name: "База данных", ok: true, uptime: "99.9%" },
   ]
   return (
     <Surface>
       <WidgetTitle>Системы и статус</WidgetTitle>
       <div className="px-4 pb-4 space-y-3">
         {systems.map((s) => (
-          <div key={s.name} className="flex items-center justify-between">
-            <StatusDot ok={s.ok} label={s.ok ? "Работает" : "Ошибка"} />
-            <span className="text-[12px] text-white/40">
-              {s.name} · {s.uptime}
-            </span>
+          <div key={s.name} className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[13px] text-white/70 w-24 truncate">{s.name}</span>
+              <StatusDot ok={s.ok} label={s.ok ? "Работает" : "Ошибка"} />
+            </div>
+            <span className="text-[12px] text-white/35 shrink-0">{s.uptime}</span>
           </div>
         ))}
       </div>
@@ -239,7 +243,7 @@ export function ProfileWidget({
     <Surface>
       <WidgetTitle>Мой профиль</WidgetTitle>
       <div className="px-4 pb-2 flex flex-col items-center text-center">
-        <div className="h-16 w-16 rounded-full bg-[#0066ff] overflow-hidden flex items-center justify-center text-[24px] font-semibold">
+        <div className="h-16 w-16 rounded-full bg-[#1e69ff] overflow-hidden flex items-center justify-center text-[24px] font-semibold ring-4 ring-[#1e69ff]/20">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -271,11 +275,11 @@ export function ProfileWidget({
 
 function formatAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 60) return `${m} мин назад`
+  const m = Math.max(0, Math.floor(diff / 60000))
+  if (m < 60) return `${m} мин. назад`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} ч назад`
-  return `${Math.floor(h / 24)} дн назад`
+  if (h < 24) return `${h} ч. назад`
+  return `${Math.floor(h / 24)} дн. назад`
 }
 
 export function RightStack({ children, className }: { children: React.ReactNode; className?: string }) {

@@ -1,37 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0c0d10;
+  --background: #080b12;
   --foreground: #ffffff;
-  --card: #16181f;
+  --card: #0f131a;
   --card-foreground: #ffffff;
-  --popover: #1c1f27;
+  --popover: #121722;
   --popover-foreground: #ffffff;
-  --primary: #0066ff;
+  --primary: #1e69ff;
   --primary-foreground: #ffffff;
-  --secondary: #252830;
-  --secondary-foreground: #4d9fff;
-  --muted: #1e2129;
-  --muted-foreground: #8b8f9a;
-  --accent: #252830;
+  --secondary: #161b26;
+  --secondary-foreground: #6ba3ff;
+  --muted: #121722;
+  --muted-foreground: #8b93a7;
+  --accent: #161b26;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
-  --border: transparent;
-  --input: #14161c;
-  --ring: #0066ff;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: #0a0d14;
+  --ring: #1e69ff;
   --radius: 16px;
 
-  --blue-400: #4d9fff;
-  --blue-500: #0066ff;
-  --blue-600: #0052cc;
-  --blue-800: #003399;
+  --blue-400: #6ba3ff;
+  --blue-500: #1e69ff;
+  --blue-600: #1557d6;
+  --blue-800: #0d3a99;
   --blue-900: #0a1a3a;
-  --surface: #0c0d10;
-  --surface-elevated: #16181f;
-  --panel: #1a1c22;
-  --panel-elevated: #1c1f27;
-  --row: #24262e;
+  --surface: #080b12;
+  --surface-elevated: #0f131a;
+  --panel: #0f131a;
+  --panel-elevated: #121722;
+  --row: #161b26;
 }
 
 @theme inline {
@@ -87,7 +87,7 @@ html {
 }
 
 body {
-  background: #07090e;
+  background: #080b12;
   color: var(--foreground);
   font-family: var(--font-manrope), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -122,7 +122,7 @@ body {
 }
 
 .field-input:focus {
-  border-color: #0066ff;
+  border-color: #1e69ff;
 }
 
 .field-input::placeholder {

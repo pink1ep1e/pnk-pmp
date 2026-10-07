@@ -35,7 +35,7 @@ export const Logo: React.FC<Props> = ({
         <span className="font-display font-semibold text-[18px] tracking-[-0.02em] text-white">
           pnk
         </span>
-        <span className="rounded-full bg-[#0066ff] px-2 py-0.5 text-[11px] font-bold tracking-wide text-white">
+        <span className="rounded-full bg-[#1e69ff] px-2 py-0.5 text-[11px] font-bold tracking-wide text-white shadow-[0_0_12px_rgba(30,105,255,0.35)]">
           PMP
         </span>
       </span>

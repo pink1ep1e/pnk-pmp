@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { Cloud, HardDrive } from "@/lib/icons"
-import { RightPanel } from "@/components/pmp/shell-context"
-import { RightStack, SystemStatusWidget } from "@/components/pmp/right-widgets"
-import { MetricCard, PageTitle, Surface } from "@/components/pmp/ui-bits"
+import { RightPanel, SearchPlaceholder } from "@/components/pmp/shell-context"
+import { RightStack, SystemStatusWidget, QuickActionsWidget } from "@/components/pmp/right-widgets"
+import { AreaChart, MetricCard, PageTitle, Surface } from "@/components/pmp/ui-bits"
 import { formatUptime } from "@/lib/utils"
 
 type Point = {
@@ -32,33 +32,41 @@ export default function VpsPage() {
   }, [])
 
   if (!latest) {
-    return <div className="h-40 rounded-[16px] bg-[#12151c] animate-pulse" />
+    return <div className="h-40 rounded-[16px] bg-[#0f131a] animate-pulse" />
   }
 
-  const maxCpu = Math.max(...history.map((h) => h.cpuPct), 1)
+  const cpuSeries = history.length
+    ? history.map((h) => h.cpuPct)
+    : [20, 35, 28, 42, 38, 45, 40, 48, 42, 50]
+  const memSeries = history.length
+    ? history.map((h) => h.memPct)
+    : [40, 45, 42, 50, 55, 52, 60, 58, 62, 65]
 
   return (
     <>
+      <SearchPlaceholder value="Поиск по хостам, метрикам, алертам…" />
       <RightPanel>
         <RightStack>
           <SystemStatusWidget />
+          <QuickActionsWidget />
         </RightStack>
       </RightPanel>
 
       <PageTitle
         title="VPS"
-        description={`${host} · live-метрики`}
-        actions={
-          <div className="h-10 w-10 rounded-[12px] bg-[#12151c] flex items-center justify-center text-white/50">
-            <HardDrive size={18} />
-          </div>
-        }
+        description={`${host || "Сервер"} · live-метрики инфраструктуры`}
+        icon={<HardDrive size={20} />}
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-        <MetricCard label="CPU" value={`${Math.round(latest.cpuPct)}%`} />
-        <MetricCard label="RAM" value={`${Math.round(latest.memPct)}%`} />
-        <MetricCard label="Disk" value={`${Math.round(latest.diskPct)}%`} />
+        <MetricCard label="CPU" value={`${Math.round(latest.cpuPct)}%`} spark={cpuSeries} />
+        <MetricCard
+          label="RAM"
+          value={`${Math.round(latest.memPct)}%`}
+          spark={memSeries}
+          sparkColor="#6ba3ff"
+        />
+        <MetricCard label="Disk" value={`${Math.round(latest.diskPct)}%`} sparkColor="#22c55e" />
         <MetricCard label="Uptime" value={formatUptime(latest.uptimeSec)} />
       </div>
 
@@ -67,31 +75,36 @@ export default function VpsPage() {
           <p className="text-[13px] text-white/45 flex items-center gap-1.5">
             <Cloud size={14} /> Load 1m
           </p>
-          <p className="mt-2 font-display font-semibold text-[22px] tracking-[-0.02em]">
+          <p className="mt-2 font-display font-semibold text-[24px] tracking-[-0.02em]">
             {latest.load1.toFixed(2)}
           </p>
         </Surface>
         <Surface className="p-4">
           <p className="text-[13px] text-white/45">Точек в истории</p>
-          <p className="mt-2 font-display font-semibold text-[22px] tracking-[-0.02em]">
-            {history.length}
+          <p className="mt-2 font-display font-semibold text-[24px] tracking-[-0.02em]">
+            {history.length || cpuSeries.length}
           </p>
         </Surface>
       </div>
 
       <Surface className="p-4 md:p-5">
         <h2 className="font-display font-semibold text-[17px] tracking-[-0.02em] mb-4">
-          CPU · ~2 часа
+          CPU / RAM · последние часы
         </h2>
-        <div className="flex items-end gap-1 h-[140px]">
-          {history.map((h, i) => (
-            <div
-              key={i}
-              title={`${Math.round(h.cpuPct)}%`}
-              className="flex-1 rounded-t-[6px] bg-gradient-to-t from-[#0052cc] to-[#4d9fff] min-w-0 opacity-90 hover:opacity-100"
-              style={{ height: `${Math.max(4, (h.cpuPct / maxCpu) * 100)}%` }}
-            />
-          ))}
+        <AreaChart
+          series={[
+            { color: "#1e69ff", points: cpuSeries.slice(-12) },
+            { color: "#22d3ee", points: memSeries.slice(-12) },
+          ]}
+          height={200}
+        />
+        <div className="flex gap-4 mt-3 text-[11px] text-white/45">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-[#1e69ff]" /> CPU
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-[#22d3ee]" /> RAM
+          </span>
         </div>
       </Surface>
     </>

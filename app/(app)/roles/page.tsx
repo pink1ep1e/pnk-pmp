@@ -1,10 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Lock, Plus, Shield } from "@/lib/icons"
-import { RightPanel } from "@/components/pmp/shell-context"
-import { AuditWidget, RightStack } from "@/components/pmp/right-widgets"
-import { MetricCard, PageTitle, Surface, Pill } from "@/components/pmp/ui-bits"
+import Link from "next/link"
+import { Check, Lock, MoreHorizontal, Plus, Shield, Users, X } from "@/lib/icons"
+import { RightPanel, SearchPlaceholder } from "@/components/pmp/shell-context"
+import { AuditWidget, RightStack, WidgetTitle } from "@/components/pmp/right-widgets"
+import {
+  DataTable,
+  MetricCard,
+  PageTitle,
+  Pill,
+  Surface,
+  Td,
+  Th,
+} from "@/components/pmp/ui-bits"
 import { Button } from "@/components/ui/button"
 import { PERMISSIONS } from "@/lib/permissions"
 
@@ -16,6 +25,16 @@ type Role = {
 }
 
 const SPARK = [5, 8, 6, 10, 9, 12, 11, 14, 13, 15]
+
+const MATRIX_ROWS = [
+  { label: "Пользователи", codes: ["id.users.read", "id.users.write", "pmp.users.manage"] },
+  { label: "Сервисы", codes: ["projects.view", "projects.manage"] },
+  { label: "Роли", codes: ["pmp.users.manage"] },
+  { label: "Почта", codes: ["mail.mailboxes.read", "mail.mailboxes.write", "mail.broadcast"] },
+  { label: "VPS", codes: ["vps.view"] },
+  { label: "Метрики", codes: ["dashboard.view"] },
+  { label: "Настройки", codes: ["pmp.profile"] },
+]
 
 export default function RolesPage() {
   const [roles, setRoles] = useState<Role[]>([])
@@ -33,33 +52,60 @@ export default function RolesPage() {
     })
   }, [])
 
-  const permCodes = PERMISSIONS.map((p) => p.code)
-
   return (
     <>
+      <SearchPlaceholder value="Поиск по ролям, разрешениям…" />
       <RightPanel>
         <RightStack>
-          <Surface className="p-4">
-            <h3 className="font-display font-semibold text-[15px] mb-3">Активные с доступом</h3>
-            {users.slice(0, 4).map((u) => (
-              <div key={u.login} className="flex items-center gap-2 py-2">
-                <div className="h-8 w-8 rounded-full bg-[#0066ff] flex items-center justify-center text-[12px] font-semibold">
-                  {u.name.charAt(0)}
+          <Surface>
+            <WidgetTitle
+              action={
+                <Link href="/users" className="text-[12px] text-[#6ba3ff]">
+                  Все пользователи →
+                </Link>
+              }
+            >
+              Активные с доступом
+            </WidgetTitle>
+            <div className="px-4 pb-3 space-y-1">
+              {users.slice(0, 5).map((u) => (
+                <div key={u.login} className="flex items-center gap-2.5 py-2">
+                  <div className="h-9 w-9 rounded-full bg-[#1e69ff] flex items-center justify-center text-[12px] font-semibold">
+                    {u.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-medium truncate">{u.name}</p>
+                    <p className="text-[11px] text-[#6ba3ff] truncate">{u.roleCodes[0] || "—"}</p>
+                  </div>
+                  <span className="text-[11px] text-white/30 shrink-0">онлайн</span>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-medium truncate">{u.name}</p>
-                  <Pill tone="blue">{u.roleCodes[0]}</Pill>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </Surface>
           <AuditWidget audit={audit} />
+          <Surface className="p-4">
+            <WidgetTitle>Служебная информация</WidgetTitle>
+            <div className="space-y-2.5 text-[13px]">
+              {[
+                ["Всего ролей", roles.length],
+                ["Всего прав", PERMISSIONS.length],
+                ["Пользователей с доступом", users.length],
+                ["Активных сессий", 248],
+              ].map(([k, v]) => (
+                <div key={String(k)} className="flex justify-between">
+                  <span className="text-white/45">{k}</span>
+                  <span className="font-semibold">{v}</span>
+                </div>
+              ))}
+            </div>
+          </Surface>
         </RightStack>
       </RightPanel>
 
       <PageTitle
         title="Роли и доступ"
-        description="Управление ролями и правами доступа"
+        description="Управление ролями, разрешениями и матрицей доступа сотрудников."
+        icon={<Lock size={20} />}
         actions={
           <>
             <Button variant="secondary">Журнал действий</Button>
@@ -72,95 +118,131 @@ export default function RolesPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-        <MetricCard label="Пользователи" value={users.length} trend={8} spark={SPARK} />
-        <MetricCard label="Ролей" value={roles.length} />
-        <MetricCard label="Сессии" value={248} trend={12} spark={SPARK} />
-        <MetricCard label="Админы" value={users.filter((u) => u.roleCodes.includes("superadmin")).length} />
+        <MetricCard
+          label="Всего пользователей"
+          value={users.length}
+          trend={8}
+          spark={SPARK}
+          icon={<Users size={14} className="text-[#6ba3ff]" />}
+        />
+        <MetricCard label="Ролей" value={roles.length} trend={1} spark={SPARK} />
+        <MetricCard label="Активных сессий" value={248} trend={12} spark={SPARK} />
+        <MetricCard
+          label="Админов"
+          value={users.filter((u) => u.roleCodes.includes("superadmin")).length}
+        />
       </div>
 
       <Surface className="mb-5">
-        <div className="overflow-x-auto">
-          <table className="w-full text-[14px]">
-            <thead>
-              <tr className="text-[12px] text-white/40">
-                <th className="px-4 py-3 text-left">Роль</th>
-                <th className="px-4 py-3 text-left">Описание</th>
-                <th className="px-4 py-3 text-left">Пользователей</th>
-                <th className="px-4 py-3 text-left">Права</th>
-                <th className="px-4 py-3 text-left">Статус</th>
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map((r) => {
-                const count = users.filter((u) => u.roleCodes.includes(r.code)).length
-                const perms =
-                  r.permissions.includes("*")
-                    ? ["Все"]
-                    : r.permissions.slice(0, 3)
-                return (
-                  <tr key={r.code} className="hover:bg-white/[0.02]">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-[12px] bg-[#0066ff]/15 flex items-center justify-center">
-                          <Shield size={18} className="text-[#4d9fff]" />
-                        </div>
-                        <span className="font-semibold">{r.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-white/45 max-w-[200px]">{r.description}</td>
-                    <td className="px-4 py-3">{count}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {perms.map((p) => (
-                          <span key={p} className="rounded-[8px] bg-[#0a0c12] px-2 py-0.5 text-[11px] text-white/50">
-                            {p}
-                          </span>
-                        ))}
-                        {!r.permissions.includes("*") && r.permissions.length > 3 ? (
-                          <span className="text-[11px] text-white/30">+{r.permissions.length - 3}</span>
-                        ) : null}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Pill tone="green">Активна</Pill>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+        <div className="px-4 py-3 flex items-center justify-between gap-3 border-b border-white/[0.04]">
+          <h2 className="font-display font-semibold text-[16px]">Роли</h2>
+          <div className="flex items-center gap-2">
+            <input
+              placeholder="Поиск ролей…"
+              className="h-9 w-40 rounded-full bg-[#0a0d14] border border-white/[0.06] px-3 text-[13px] outline-none placeholder:text-white/30"
+            />
+            <select className="h-9 rounded-full bg-[#0a0d14] border border-white/[0.06] px-3 text-[12px] text-white/50 outline-none">
+              <option>Все роли</option>
+            </select>
+          </div>
         </div>
+        <DataTable>
+          <thead>
+            <tr>
+              <Th>Название роли</Th>
+              <Th>Описание</Th>
+              <Th>Пользователей</Th>
+              <Th>Права</Th>
+              <Th>Статус</Th>
+              <Th className="w-10" />
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map((r) => {
+              const count = users.filter((u) => u.roleCodes.includes(r.code)).length
+              const perms = r.permissions.includes("*")
+                ? ["Все права"]
+                : r.permissions.slice(0, 2).map((p) => p.split(".")[0])
+              return (
+                <tr key={r.code} className="hover:bg-white/[0.02]">
+                  <Td>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-[12px] bg-[#1e69ff]/15 flex items-center justify-center">
+                        <Shield size={18} className="text-[#6ba3ff]" />
+                      </div>
+                      <span className="font-semibold">{r.name}</span>
+                    </div>
+                  </Td>
+                  <Td className="text-white/45 max-w-[220px]">{r.description}</Td>
+                  <Td>{count}</Td>
+                  <Td>
+                    <div className="flex flex-wrap gap-1">
+                      {perms.map((p) => (
+                        <Pill key={p} tone="neutral">
+                          {p}
+                        </Pill>
+                      ))}
+                      {!r.permissions.includes("*") && r.permissions.length > 2 ? (
+                        <Pill tone="blue">+{r.permissions.length - 2}</Pill>
+                      ) : null}
+                    </div>
+                  </Td>
+                  <Td>
+                    <span className="inline-flex items-center gap-1.5 text-[13px] text-[#22c55e] font-medium">
+                      <span className="h-2 w-2 rounded-full bg-[#22c55e]" />
+                      Активна
+                    </span>
+                  </Td>
+                  <Td>
+                    <MoreHorizontal size={16} className="text-white/30" />
+                  </Td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </DataTable>
       </Surface>
 
       <Surface className="p-4 overflow-x-auto">
-        <h2 className="font-display font-semibold text-[16px] mb-4 flex items-center gap-2">
-          <Lock size={18} />
-          Матрица прав доступа
-        </h2>
-        <table className="w-full text-[12px] min-w-[600px]">
+        <div className="flex items-center justify-between mb-4 gap-3">
+          <h2 className="font-display font-semibold text-[16px] flex items-center gap-2">
+            <Lock size={18} />
+            Права доступа
+          </h2>
+          <Button size="sm" variant="secondary">
+            Настроить права
+          </Button>
+        </div>
+        <table className="w-full text-[12px] min-w-[640px]">
           <thead>
             <tr className="text-white/40">
-              <th className="text-left py-2 pr-4">Функция</th>
+              <th className="text-left py-2.5 pr-4 font-medium">Функция</th>
               {roles.map((r) => (
-                <th key={r.code} className="px-2 py-2 text-center font-medium">
+                <th key={r.code} className="px-2 py-2.5 text-center font-medium">
                   {r.name}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {permCodes.slice(0, 8).map((code) => (
-              <tr key={code} className="border-t border-white/[0.04]">
-                <td className="py-2 pr-4 text-white/60">{code}</td>
+            {MATRIX_ROWS.map((row) => (
+              <tr key={row.label} className="border-t border-white/[0.04]">
+                <td className="py-3 pr-4 text-white/65 font-medium">{row.label}</td>
                 {roles.map((r) => {
-                  const ok = r.permissions.includes("*") || r.permissions.includes(code)
+                  const ok =
+                    r.permissions.includes("*") ||
+                    row.codes.some((c) => r.permissions.includes(c))
                   return (
-                    <td key={r.code} className="px-2 py-2 text-center">
-                      {ok ? (
-                        <span className="text-[#3dd68c]">✓</span>
-                      ) : (
-                        <span className="text-[#ff5c5c]">✕</span>
-                      )}
+                    <td key={r.code} className="px-2 py-3 text-center">
+                      <span
+                        className={
+                          ok
+                            ? "inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#22c55e]/15 text-[#22c55e]"
+                            : "inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#ef4444]/15 text-[#ef4444]"
+                        }
+                      >
+                        {ok ? <Check size={12} /> : <X size={12} />}
+                      </span>
                     </td>
                   )
                 })}

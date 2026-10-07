@@ -50,7 +50,7 @@ export default function SupportThreadPage() {
   }
 
   if (!thread) {
-    return <div className="h-40 rounded-[16px] bg-[#12151c] animate-pulse" />
+    return <div className="h-40 rounded-[16px] bg-[#0f131a] animate-pulse" />
   }
 
   return (
@@ -75,7 +75,7 @@ export default function SupportThreadPage() {
             key={m.id}
             className={cn(
               "rounded-[16px] px-4 py-3 max-w-[88%]",
-              m.direction === "in" ? "bg-[#0a0c12]" : "bg-[#0066ff]/20 ml-auto",
+              m.direction === "in" ? "bg-[#0a0d14]" : "bg-[#1e69ff]/20 ml-auto",
             )}
           >
             <p className="text-[12px] text-white/40 mb-1">{m.fromEmail}</p>
