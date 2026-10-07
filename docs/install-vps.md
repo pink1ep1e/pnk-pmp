@@ -19,7 +19,7 @@
 Узнать пароль Postgres из `.env` mail или id:
 
 ```bash
-grep DATABASE_URL /var/www/pnk-mail/.env
+grep DATABASE_URL ~/pnk-mail/.env
 # пример: postgresql://pnk:SECRET@localhost:5432/pnk_mail?schema=public
 ```
 
@@ -43,13 +43,25 @@ psql "postgresql://pnk:ТВОЙ_ПАРОЛЬ@localhost:5432/postgres" -c "CREATE
 
 ---
 
-## 2. Клон кода
+## 2. Клон кода (в домашнюю директорию)
+
+Рядом с `~/pnk-mail` и `~/pnk-id`:
 
 ```bash
-cd /var/www   # или /opt/pnk — рядом с pnk-mail / pnk-id
-sudo git clone https://github.com/pink1ep1e/pnk-pmp.git pnk-pmp
-sudo chown -R $USER:$USER pnk-pmp
-cd /var/www/pnk-pmp
+cd ~
+git clone https://github.com/pink1ep1e/pnk-pmp.git pnk-pmp
+cd ~/pnk-pmp
+```
+
+Если папка уже есть (ошибка `already exists`):
+
+```bash
+cd ~/pnk-pmp
+# уже git-репо — просто обновить:
+git pull
+
+# или снести и клонировать заново (если папка битая/пустая):
+# cd ~ && rm -rf pnk-pmp && git clone https://github.com/pink1ep1e/pnk-pmp.git pnk-pmp && cd ~/pnk-pmp
 ```
 
 ---
@@ -89,7 +101,7 @@ VPS_INGEST_SECRET="общий_секрет_с_агентом"
 ## 4. Сборка и PM2
 
 ```bash
-cd /var/www/pnk-pmp
+cd ~/pnk-pmp
 npm ci
 npx prisma generate
 
@@ -184,7 +196,7 @@ PMP **не** заменяет OAuth pnk-id для конечных пользо�
 ## 7. Обновление
 
 ```bash
-cd /var/www/pnk-pmp
+cd ~/pnk-pmp
 git pull
 npm ci
 npx prisma generate
