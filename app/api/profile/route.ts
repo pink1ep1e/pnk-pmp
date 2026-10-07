@@ -51,6 +51,7 @@ export async function PATCH(req: Request) {
       name: user.name,
       avatarUrl: user.avatarUrl,
       roles: user.roleCodes,
+      roleCodes: user.roleCodes,
     },
   })
 }

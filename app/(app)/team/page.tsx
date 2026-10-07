@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { KeyRound, Users } from "@/lib/icons"
 import { PageHeader } from "@/components/pmp/page-header"
+import { Panel } from "@/components/pmp/panel"
 import { Button } from "@/components/ui/button"
 
 type User = {
@@ -11,6 +13,7 @@ type User = {
   isActive: boolean
   roleCodes: string[]
   projectAccess: { projectCode: string }[]
+  avatarUrl?: string | null
 }
 
 export default function TeamPage() {
@@ -78,73 +81,99 @@ export default function TeamPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Команда"
-        description="Пользователи PMP, роли и доступ к проектам"
-      />
+      <PageHeader title="Команда" description="Сотрудники, роли и доступы" />
 
-      <section className="rounded-[20px] bg-[#16181f] p-5 md:p-6 mb-4">
-        <h2 className="font-display font-semibold text-[18px] mb-4">Добавить</h2>
+      <Panel className="p-4 md:p-5 mb-4">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="h-9 w-9 rounded-[12px] bg-[#24262e] flex items-center justify-center text-white/50">
+            <Users size={18} />
+          </div>
+          <h2 className="font-display font-semibold text-[17px] tracking-[-0.02em]">
+            Добавить
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <input
             value={login}
             onChange={(e) => setLogin(e.target.value)}
             placeholder="login"
-            className="h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
+            className="field-input"
           />
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Имя"
-            className="h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
+            className="field-input"
           />
           <select
             value={roleCodes[0]}
             onChange={(e) => setRoleCodes([e.target.value])}
-            className="h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
+            className="field-input appearance-none"
           >
             {roles.map((r) => (
-              <option key={r.code} value={r.code}>
+              <option key={r.code} value={r.code} className="bg-[#1a1c22]">
                 {r.name}
               </option>
             ))}
           </select>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button onClick={createUser} disabled={!login || !name}>
-            Создать и сгенерировать пароль
+            Создать
           </Button>
           {generated ? (
-            <code className="text-[13px] text-[#4d9fff] bg-[#0f1115] px-3 py-2 rounded-[10px]">
+            <code className="text-[13px] text-[#4d9fff] bg-[#0f1115] px-3 py-2 rounded-[12px]">
               {generated}
             </code>
           ) : null}
         </div>
-      </section>
+      </Panel>
 
-      <section className="rounded-[20px] bg-[#16181f] overflow-hidden divide-y divide-white/5">
-        {users.map((u) => (
-          <div key={u.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <p className="font-semibold">
-                {u.name} <span className="text-white/40">@{u.login}</span>
-              </p>
-              <p className="text-[13px] text-white/40 mt-1">
-                роли: {u.roleCodes.join(", ")} · проекты:{" "}
-                {u.projectAccess.map((p) => p.projectCode).join(", ")}
-              </p>
+      <Panel>
+        {users.map((u) => {
+          const letter = (u.name || u.login).charAt(0).toUpperCase()
+          return (
+            <div
+              key={u.id}
+              className="px-4 md:px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="h-11 w-11 rounded-[14px] bg-[#0066ff] flex items-center justify-center font-semibold shrink-0 overflow-hidden">
+                  {u.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={u.avatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    letter
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold truncate">
+                    {u.name}{" "}
+                    <span className="text-white/40 font-normal">@{u.login}</span>
+                  </p>
+                  <p className="text-[13px] text-white/40 mt-0.5 truncate">
+                    {u.roleCodes.join(", ")}
+                    {!u.isActive ? " · отключён" : ""}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 sm:shrink-0">
+                <Button size="sm" variant="secondary" onClick={() => resetPassword(u.id)}>
+                  <KeyRound size={14} />
+                  Пароль
+                </Button>
+                <Button
+                  size="sm"
+                  variant={u.isActive ? "ghost" : "default"}
+                  onClick={() => toggleActive(u)}
+                >
+                  {u.isActive ? "Отключить" : "Включить"}
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button size="sm" variant="secondary" onClick={() => resetPassword(u.id)}>
-                Новый пароль
-              </Button>
-              <Button size="sm" variant={u.isActive ? "outline" : "default"} onClick={() => toggleActive(u)}>
-                {u.isActive ? "Отключить" : "Включить"}
-              </Button>
-            </div>
-          </div>
-        ))}
-      </section>
+          )
+        })}
+      </Panel>
     </div>
   )
 }

@@ -1,86 +1,228 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { Camera, Lock, Pencil, User } from "@/lib/icons"
 import { PageHeader } from "@/components/pmp/page-header"
+import { Panel } from "@/components/pmp/panel"
 import { Button } from "@/components/ui/button"
 
 export default function ProfilePage() {
+  const fileRef = useRef<HTMLInputElement>(null)
   const [name, setName] = useState("")
   const [login, setLogin] = useState("")
-  const [avatarUrl, setAvatarUrl] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [roles, setRoles] = useState<string[]>([])
+  const [editing, setEditing] = useState(false)
   const [currentPassword, setCurrentPassword] = useState("")
   const [password, setPassword] = useState("")
   const [msg, setMsg] = useState("")
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
+  function load() {
     fetch("/api/profile")
       .then((r) => r.json())
       .then((d) => {
         setName(d.user?.name || "")
         setLogin(d.user?.login || "")
-        setAvatarUrl(d.user?.avatarUrl || "")
+        setAvatarUrl(d.user?.avatarUrl || null)
+        setRoles(d.user?.roles || d.user?.roleCodes || [])
       })
+  }
+
+  useEffect(() => {
+    load()
   }, [])
 
+  function onPickAvatar(file: File | undefined) {
+    if (!file || !file.type.startsWith("image/")) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = String(reader.result || "")
+      if (dataUrl.length > 800_000) {
+        setMsg("Файл слишком большой — выбери фото поменьше")
+        return
+      }
+      setAvatarUrl(dataUrl)
+      setEditing(true)
+    }
+    reader.readAsDataURL(file)
+  }
+
   async function save() {
+    setSaving(true)
     setMsg("")
     const r = await fetch("/api/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name,
-        avatarUrl: avatarUrl || null,
+        avatarUrl,
         currentPassword: password ? currentPassword : undefined,
         password: password || undefined,
       }),
     })
     const j = await r.json()
-    if (!r.ok) setMsg(j.error || "Ошибка")
-    else {
-      setMsg("Сохранено")
-      setPassword("")
-      setCurrentPassword("")
+    setSaving(false)
+    if (!r.ok) {
+      setMsg(j.error || "Ошибка")
+      return
     }
+    setMsg("Сохранено")
+    setPassword("")
+    setCurrentPassword("")
+    setEditing(false)
+    load()
   }
+
+  const letter = (name || login || "?").charAt(0).toUpperCase()
 
   return (
     <div>
-      <PageHeader title="Профиль" description={`Аккаунт @${login}`} />
-      <div className="max-w-[520px] rounded-[20px] bg-[#16181f] p-5 md:p-6 space-y-3">
+      <PageHeader title="Профиль" description="Данные сотрудника PMP" />
+
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        className="w-full rounded-[22px] bg-[#1a1c22] p-4 md:p-5 flex items-center gap-4 text-left hover:bg-[#1e2028] transition-colors mb-4"
+      >
+        <div className="relative shrink-0">
+          <div className="h-16 w-16 md:h-[72px] md:w-[72px] rounded-[18px] bg-[#0066ff] overflow-hidden flex items-center justify-center text-[28px] font-semibold">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              letter
+            )}
+          </div>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-display font-semibold text-[20px] tracking-[-0.02em] truncate">
+            {name || "Без имени"}
+          </p>
+          <p className="mt-1 text-[14px] text-white/45">@{login}</p>
+          {roles.length ? (
+            <p className="mt-2 text-[12px] text-[#4d9fff]">{roles.join(" · ")}</p>
+          ) : null}
+        </div>
+        <div className="h-10 w-10 rounded-full bg-[#0f1115] flex items-center justify-center text-white/50">
+          <Pencil size={16} />
+        </div>
+      </button>
+
+      {editing ? (
+        <Panel className="mb-4 p-4 md:p-5 space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="h-[72px] w-[72px] rounded-[18px] bg-[#0066ff] overflow-hidden flex items-center justify-center text-[28px] font-semibold">
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  letter
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-[#0066ff] flex items-center justify-center shadow-lg"
+              >
+                <Camera size={14} />
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => onPickAvatar(e.target.files?.[0])}
+              />
+            </div>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="text-[14px] text-[#4d9fff] font-medium"
+              >
+                Загрузить фото
+              </button>
+              {avatarUrl ? (
+                <button
+                  type="button"
+                  onClick={() => setAvatarUrl(null)}
+                  className="block text-[13px] text-white/40"
+                >
+                  Убрать
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[13px] text-white/40 mb-1.5 block">Отображаемое имя</label>
+            <input
+              className="field-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Имя"
+            />
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <Button onClick={save} loading={saving}>
+              Сохранить
+            </Button>
+            <Button variant="secondary" onClick={() => setEditing(false)}>
+              Отмена
+            </Button>
+          </div>
+        </Panel>
+      ) : null}
+
+      <p className="text-[13px] text-white/40 mb-2 px-1 flex items-center gap-2">
+        <User size={14} />
+        Аккаунт
+      </p>
+      <Panel className="mb-4">
+        <div className="px-4 md:px-5 py-4 flex items-center justify-between min-h-[64px]">
+          <div>
+            <p className="text-[14px] font-medium">Логин</p>
+            <p className="text-[13px] text-white/40 mt-0.5">@{login}</p>
+          </div>
+        </div>
+      </Panel>
+
+      <p className="text-[13px] text-white/40 mb-2 px-1 flex items-center gap-2">
+        <Lock size={14} />
+        Безопасность
+      </p>
+      <Panel className="p-4 md:p-5 space-y-3">
         <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Имя"
-          className="w-full h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
+          type="password"
+          className="field-input"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          placeholder="Текущий пароль"
+          autoComplete="current-password"
         />
         <input
-          value={avatarUrl}
-          onChange={(e) => setAvatarUrl(e.target.value)}
-          placeholder="URL аватарки"
-          className="w-full h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
+          type="password"
+          className="field-input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Новый пароль"
+          autoComplete="new-password"
         />
-        <div className="pt-2 border-t border-white/5 space-y-3">
-          <p className="text-[13px] text-white/40">Смена пароля</p>
-          <input
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Текущий пароль"
-            className="w-full h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Новый пароль"
-            className="w-full h-12 rounded-[12px] bg-[#0f1115] px-4 outline-none"
-          />
-        </div>
-        <div className="flex items-center gap-3 pt-2">
-          <Button onClick={save}>Сохранить</Button>
-          {msg ? <span className="text-[13px] text-white/50">{msg}</span> : null}
-        </div>
-      </div>
+        <Button
+          onClick={save}
+          loading={saving}
+          disabled={!password}
+          className="w-full"
+          size="lg"
+        >
+          Сменить пароль
+        </Button>
+      </Panel>
+
+      {msg ? <p className="mt-4 text-[14px] text-white/50 px-1">{msg}</p> : null}
     </div>
   )
 }

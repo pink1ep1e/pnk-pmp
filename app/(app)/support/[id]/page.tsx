@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { ArrowRight } from "@/lib/icons"
 import { PageHeader } from "@/components/pmp/page-header"
+import { Panel } from "@/components/pmp/panel"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -48,7 +50,9 @@ export default function SupportThreadPage() {
     setLoading(false)
   }
 
-  if (!thread) return <p className="text-white/40">Загрузка…</p>
+  if (!thread) {
+    return <div className="h-40 rounded-[18px] bg-[#1a1c22] animate-pulse" />
+  }
 
   return (
     <div>
@@ -56,19 +60,23 @@ export default function SupportThreadPage() {
         title={thread.subject}
         description={`${thread.fromName || thread.fromEmail} → ${thread.mailbox}`}
         actions={
-          <Link href="/support" className="text-[14px] text-white/50 hover:text-white">
-            ← Inbox
+          <Link
+            href="/support"
+            className="text-[14px] text-[#4d9fff] flex items-center gap-1.5 hover:underline"
+          >
+            <ArrowRight size={14} className="rotate-180" />
+            Inbox
           </Link>
         }
       />
 
-      <div className="rounded-[20px] bg-[#16181f] p-4 md:p-5 space-y-3 mb-4">
+      <Panel className="p-4 md:p-5 space-y-3 mb-4">
         {thread.messages.map((m) => (
           <div
             key={m.id}
             className={cn(
-              "rounded-[16px] px-4 py-3 max-w-[85%]",
-              m.direction === "in" ? "bg-[#1c1f27]" : "bg-[#003399]/40 ml-auto",
+              "rounded-[16px] px-4 py-3 max-w-[88%]",
+              m.direction === "in" ? "bg-[#0f1115]" : "bg-[#0066ff]/20 ml-auto",
             )}
           >
             <p className="text-[12px] text-white/40 mb-1">{m.fromEmail}</p>
@@ -80,15 +88,15 @@ export default function SupportThreadPage() {
             </p>
           </div>
         ))}
-      </div>
+      </Panel>
 
-      <div className="rounded-[20px] bg-[#16181f] p-4 md:p-5">
+      <Panel className="p-4 md:p-5">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={4}
           placeholder="Ответ…"
-          className="w-full rounded-[12px] bg-[#0f1115] px-4 py-3 outline-none focus:shadow-[0_0_0_3px_rgba(0,102,255,0.22)] resize-y"
+          className="field-input h-auto py-3 resize-y"
         />
         <div className="mt-3 flex flex-wrap gap-2">
           <Button loading={loading} onClick={() => reply("pending")} disabled={!text.trim()}>
@@ -103,7 +111,7 @@ export default function SupportThreadPage() {
             Ответить и закрыть
           </Button>
         </div>
-      </div>
+      </Panel>
     </div>
   )
 }
