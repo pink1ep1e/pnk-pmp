@@ -162,9 +162,31 @@ curl -s http://127.0.0.1:3200/api/health
 
 ## 6. Nginx + HTTPS
 
+### 6.1 DNS
+
+A-запись: `pmp.pnkmail.ru` → IP VPS (тот же, что у `pnkmail.ru` / `id.pnkmail.ru`).
+
+### 6.2 Блок в существующем конфиге
+
+Обычно всё в `/etc/nginx/sites-available/pnk`. Добавь **новый** `server` (блоки id/mail не трогай):
+
+```bash
+sudo nano /etc/nginx/sites-available/pnk
+```
+
+В конец файла:
+
 ```nginx
 server {
+  listen 80;
+  listen [::]:80;
   server_name pmp.pnkmail.ru;
+
+  client_max_body_size 20m;
+  proxy_buffer_size 32k;
+  proxy_buffers 8 32k;
+  proxy_busy_buffers_size 64k;
+  large_client_header_buffers 4 32k;
 
   location / {
     proxy_pass http://127.0.0.1:3200;
@@ -179,9 +201,18 @@ server {
 ```
 
 ```bash
+# убедись что сайт включён
+sudo ln -sf /etc/nginx/sites-available/pnk /etc/nginx/sites-enabled/pnk
 sudo nginx -t && sudo systemctl reload nginx
+
+# HTTPS
 sudo certbot --nginx -d pmp.pnkmail.ru
 ```
+
+Проверка до certbot: `curl -sI -H "Host: pmp.pnkmail.ru" http://127.0.0.1`  
+После: https://pmp.pnkmail.ru — логин **admin** / **admin123**.
+
+Перед nginx: `pm2 ls` — процесс `pnk-pmp` должен слушать **3200** (`curl -s http://127.0.0.1:3200/api/health`).
 
 ---
 
